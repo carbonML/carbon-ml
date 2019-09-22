@@ -2,6 +2,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import classification_report
 from carbon_ml.atom.inputs.input_data import InputDataFrame
 from carbon_ml.atom.errors import AtomError
+from carbon_ml.atom.plotting.basic import BasicPlotter
 
 
 class Atom:
@@ -57,6 +58,8 @@ class Atom:
         if params_dict.get("evaluate") == "classification":
             self.evaluate_classification_performance()
             print(self.classification_report)
+
+        BasicPlotter.show_learning_curve(train_errors=self.train_errors, test_errors=self.test_errors)
 
     def predict_probability(self, input_dict):
         """
