@@ -16,10 +16,11 @@ class TestAtom(TestCase):
         self.assertEqual([], test.train_errors)
         self.assertEqual([], test.test_errors)
 
+    @patch("carbon_ml.atom.BasicPlotter")
     @patch("carbon_ml.atom.Atom.evaluate_classification_performance")
     @patch("carbon_ml.atom.mean_squared_error")
     @patch("carbon_ml.atom.Atom.__init__")
-    def test_train(self, mock_init, mock_mean_squared_error, mock_classification_report):
+    def test_train(self, mock_init, mock_mean_squared_error, mock_classification_report, mock_plotter):
         mock_init.return_value = None
         test = Atom(data="test data", model="test model", name="test name")
         test.data = MagicMock()
@@ -31,6 +32,7 @@ class TestAtom(TestCase):
         test.data.y_test = [1, 2, 3, 4, 5]
 
         test.train(params_dict={"starting_point": 1, "batch_size": 1})
+        mock_plotter.show_learning_curve.assert_called_once()
 
         self.assertEqual(([1], [1]), test.model.fit.call_args_list[0][0])
         self.assertEqual(([1, 2], [1, 2]), test.model.fit.call_args_list[1][0])
