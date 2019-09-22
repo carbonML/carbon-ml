@@ -95,3 +95,23 @@ class InputDataFrame:
         self.scaling_tool.fit(self.x_train)
         self.x_train = self.scaling_tool.transform(self.x_train)
         self.x_test = self.scaling_tool.transform(self.x_test)
+
+    def prep_inputs(self, input_dict):
+        """
+        Checks inputs for model prediction and orders them in the right way.
+
+        :param input_dict: (dict) inputs for model prediction
+        :return: list or ordered inputs
+        """
+        if self.input_order is None:
+            raise InputDataFrameError("model has not been trained yet so cannot accept inputs for calculation")
+        inputs = []
+        key_errors = []
+        for variable in self.input_order:
+            if variable not in input_dict.keys():
+                key_errors.append(variable)
+            else:
+                inputs.append(input_dict[variable])
+        if len(key_errors) > 0:
+            raise InputDataFrameError("{} were not supplied to the model".format(key_errors))
+        return inputs

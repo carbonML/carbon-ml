@@ -16,9 +16,10 @@ class TestAtom(TestCase):
         self.assertEqual([], test.train_errors)
         self.assertEqual([], test.test_errors)
 
+    @patch("carbon_ml.atom.Atom.evaluate_classification_performance")
     @patch("carbon_ml.atom.mean_squared_error")
     @patch("carbon_ml.atom.Atom.__init__")
-    def test_train(self, mock_init, mock_mean_squared_error):
+    def test_train(self, mock_init, mock_mean_squared_error, mock_classification_report):
         mock_init.return_value = None
         test = Atom(data="test data", model="test model", name="test name")
         test.data = MagicMock()
@@ -46,6 +47,33 @@ class TestAtom(TestCase):
         test.train(params_dict={"starting_point": 1, "batch_size": 2})
 
         self.assertEqual(12, len(mock_mean_squared_error.call_args_list))
+
+        test.classification_report = None
+        test.train(params_dict={"starting_point": 1, "batch_size": 2, "evaluate": "classification"})
+        mock_classification_report.assert_called_once_with()
+
+    @patch("carbon_ml.atom.classification_report")
+    @patch("carbon_ml.atom.Atom.__init__")
+    def test_evaluate_classification_performance(self, mock_init, mock_classification_report):
+        mock_init.return_value = None
+        test = Atom(data="test data", model="test model", name="test name")
+        test.model = MagicMock()
+        test.data = MagicMock()
+        test.evaluate_classification_performance()
+
+        mock_classification_report.assert_called_once_with(test.data.y_test, test.model.predict.return_value)
+        self.assertEqual(test.classification_report, mock_classification_report.return_value)
+
+    @patch("carbon_ml.atom.Atom.__init__")
+    def test_predict_probability(self, mock_init):
+        mock_init.return_value = None
+        test = Atom(data="test data", model="test model", name="test name")
+        test.data = MagicMock()
+        test.model = MagicMock()
+
+        test.predict_probability(input_dict={"one": 1})
+        test.data.prep_inputs.assert_called_once_with(input_dict={"one": 1})
+        test.model.predict_proba.assert_called_once_with([test.data.prep_inputs.return_value])
 
 
 if __name__ == "__main__":

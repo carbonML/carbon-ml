@@ -1,5 +1,7 @@
 from sklearn.metrics import mean_squared_error
+from sklearn.metrics import classification_report
 from carbon_ml.atom.inputs.input_data import InputDataFrame
+from carbon_ml.atom.errors import AtomError
 
 
 class Atom:
@@ -25,6 +27,7 @@ class Atom:
         self.name = name
         self.train_errors = []
         self.test_errors = []
+        self.classification_report = None
 
     def train(self, params_dict):
         """
@@ -38,7 +41,7 @@ class Atom:
         self.data.prep_for_training(outcome_pointer=params_dict.get("outcome_pointer"), params_dict=params_dict)
         cut_off = params_dict.get("cut_off", False)
 
-        for i in range(params_dict.get("starting_point", 10),
+        for i in range(params_dict.get("starting_point", 100),
                        len(self.data.x_train), params_dict.get("batch_size", 100)):
             self.model.fit(self.data.x_train[:i], self.data.y_train[:i])
 
@@ -51,3 +54,28 @@ class Atom:
             if cut_off is not False:
                 if len(self.train_errors) == cut_off:
                     break
+        if params_dict.get("evaluate") == "classification":
+            self.evaluate_classification_performance()
+            print(self.classification_report)
+
+    def predict_probability(self, input_dict):
+        """
+        Gives probability of outcomes.
+
+        :param input_dict: (list) inputs for model
+        :return: array of probabilities
+        """
+        input_array = self.data.prep_inputs(input_dict=input_dict)
+        return self.model.predict_proba([input_array])
+
+    def evaluate_classification_performance(self):
+        """
+        Produces classification report of finished model
+        :return: list of predictions from the X_test data subset
+        """
+        predictions = self.model.predict(self.data.x_test)
+        self.classification_report = classification_report(self.data.y_test, predictions)
+
+    def deploy(self):
+        # overwrite the picking functions
+        pass
