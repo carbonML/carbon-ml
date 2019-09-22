@@ -64,6 +64,17 @@ class TestAtom(TestCase):
         mock_classification_report.assert_called_once_with(test.data.y_test, test.model.predict.return_value)
         self.assertEqual(test.classification_report, mock_classification_report.return_value)
 
+    @patch("carbon_ml.atom.Atom.__init__")
+    def test_predict_probability(self, mock_init):
+        mock_init.return_value = None
+        test = Atom(data="test data", model="test model", name="test name")
+        test.data = MagicMock()
+        test.model = MagicMock()
+
+        test.predict_probability(input_dict={"one": 1})
+        test.data.prep_inputs.assert_called_once_with(input_dict={"one": 1})
+        test.model.predict_proba.assert_called_once_with([test.data.prep_inputs.return_value])
+
 
 if __name__ == "__main__":
     main()

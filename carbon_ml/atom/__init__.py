@@ -58,9 +58,15 @@ class Atom:
             self.evaluate_classification_performance()
             print(self.classification_report)
 
-    def predict(self):
-        # define inputs and outputs in data frame
-        pass
+    def predict_probability(self, input_dict):
+        """
+        Gives probability of outcomes.
+
+        :param input_dict: (list) inputs for model
+        :return: array of probabilities
+        """
+        input_array = self.data.prep_inputs(input_dict=input_dict)
+        return self.model.predict_proba([input_array])
 
     def evaluate_classification_performance(self):
         """

@@ -86,6 +86,22 @@ class TestInputDataFrame(TestCase):
         with self.assertRaises(Exception):
             test.scale_data(scaling_tool="test")
 
+    @patch("carbon_ml.atom.inputs.input_data.InputDataFrame.__init__")
+    def test_prep_inputs(self, mock_init):
+        mock_init.return_value = None
+        test = InputDataFrame(data_frame="test")
+        test.input_order = None
+
+        with self.assertRaises(Exception):
+            test.prep_inputs(input_dict={"one": 1, "two": 2, "three": 3})
+
+        test.input_order = ["one", "two", "three"]
+        with self.assertRaises(Exception):
+            test.prep_inputs(input_dict={"one": 1, "two": 2, "four": 3})
+
+        out_come = test.prep_inputs(input_dict={"one": 1, "two": 2, "three": 3})
+        self.assertEqual([1, 2, 3], out_come)
+
 
 if __name__ == "__main__":
     main()
