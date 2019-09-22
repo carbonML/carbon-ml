@@ -1,3 +1,4 @@
+from carbon_ml.caching import CacheManager
 
 
 class StateOfMatter:
@@ -5,6 +6,7 @@ class StateOfMatter:
     def __init__(self):
         self.model = None
         self.data = None
+        self.cache = CacheManager()
 
     def load(self):
         pass
