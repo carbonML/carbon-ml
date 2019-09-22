@@ -105,3 +105,20 @@ venv.bak/
 
 # pycharm
 .idea
+
+# system files
+.DS_Store
+
+### macOS ###
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Compiled python modules.
+*.pyc
+
+# Setuptools distribution folder.
+/dist/
+
+# Python egg metadata, regenerated from source files by setuptools.
+/*.egg-info
